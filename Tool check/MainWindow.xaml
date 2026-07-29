@@ -329,7 +329,10 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="NỘI DUNG TỆP JSON MINH BẠCH GỐC (RAW)" FontSize="11" FontWeight="Bold" Foreground="#94a3b8" Margin="0,0,0,8"/>
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <TextBlock Text="NỘI DUNG TỆP JSON MINH BẠCH GỐC (RAW)" FontSize="11" FontWeight="Bold" Foreground="#94a3b8" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Button x:Name="DownloadJsonBtn" Content="Tải Xuống File JSON" Background="#3b82f6" Foreground="White" BorderThickness="0" Padding="12,4" FontSize="10" FontWeight="Bold" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Center" Click="DownloadJsonBtn_Click"/>
+                            </Grid>
                             <TextBox x:Name="RawJsonTextBox" Grid.Row="1" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Background="#090d16" Foreground="#f8fafc" BorderBrush="#14FFFFFF" Padding="10" FontFamily="Consolas" FontSize="11.5" AcceptsReturn="True"/>
                         </Grid>
                     </Border>

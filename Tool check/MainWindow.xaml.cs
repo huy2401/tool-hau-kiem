@@ -686,5 +686,35 @@ namespace Tool_check
             }
         }
 
+        private void DownloadJsonBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(RawJsonTextBox.Text) || RawJsonTextBox.Text.StartsWith("Không thể"))
+            {
+                MessageBox.Show("Không có dữ liệu JSON hợp lệ để tải xuống.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*",
+                DefaultExt = "json",
+                FileName = "transparency.json",
+                Title = "Tải xuống tệp JSON minh bạch"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    File.WriteAllText(saveFileDialog.FileName, RawJsonTextBox.Text);
+                    MessageBox.Show("Tải xuống tệp JSON thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi lưu tệp JSON:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
     }
 }
