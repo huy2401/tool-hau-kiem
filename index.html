@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Kiểm Chứng Bốc Thăm Độc Lập - NOXH</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-gradient-start: #0f172a;
+      --bg-gradient-end: #020617;
+      --card-bg: rgba(30, 41, 59, 0.45);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Glassmorphism Card Style */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-sub);
+      font-size: 1.1rem;
+    }
+
+    /* Setup Grid Layout */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    @media (max-width: 768px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.25);
+    }
+
+    /* Status & Summary */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Result Dashboard Layout */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Tab styles */
+    .tab-header {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--primary);
+    }
+
+    /* Check List Item */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .check-item:last-child {
+      border-bottom: none;
+    }
+
+    .check-icon {
+      font-size: 1.25rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .check-details {
+      flex: 1;
+    }
+
+    .check-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .check-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    /* Deck Grid Visualizer */
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .ticket-card {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .ticket-win {
+      border-left: 4px solid var(--success);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .ticket-wait {
+      border-left: 4px solid var(--warning);
+      background: rgba(245, 158, 11, 0.06);
+    }
+
+    .ticket-lose {
+      border-left: 4px solid var(--error);
+      background: rgba(239, 68, 68, 0.06);
+    }
+
+    .ticket-waitlist {
+      border-left: 4px solid var(--accent);
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    .ticket-pos {
+      font-weight: 700;
+      color: var(--text-sub);
+      font-size: 0.75rem;
+    }
+
+    .ticket-payload {
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .ticket-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* File Drag-Drop Area */
+    .drag-drop-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-sub);
+      transition: all 0.2s ease;
+      margin-top: 1rem;
+    }
+
+    .drag-drop-zone:hover,
+    .drag-drop-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.05);
+      color: var(--text-main);
+    }
+
+    /* Code View / Logs style */
+    pre {
+      background: #090d16;
+      padding: 0.75rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      max-height: 150px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-4 {
+      margin-top: 1rem;
+    }
+
+    /* Spinner Animation */
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>Hệ Thống Kiểm Chứng Bốc Thăm Độc Lập</h1>
+      <p>Giải pháp xác minh và hậu kiểm kết quả bốc thăm NOXH tự động</p>
+    </header>
+
+    <!-- Input Form Card -->
+    <div class="glass-card">
+      <div class="input-grid">
+        <div class="form-group">
+          <label for="apiUrl">Server API URL</label>
+          <input type="text" id="apiUrl" value="https://demo-boctham.vubao.dev/api"
+            placeholder="Nhập URL API của Server">
+        </div>
+        <div class="form-group">
+          <label for="projectId">Project ID (UUID)</label>
+          <input type="text" id="projectId" placeholder="Nhập mã dự án">
+        </div>
+        <div>
+          <button id="btnVerify" class="btn">Bắt Đầu Đối Chiếu</button>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <p style="font-size: 0.85rem; color: var(--text-sub);">Hoặc kéo thả file JSON minh bạch tải về từ server để kiểm
+          tra offline:</p>
+        <div id="dropZone" class="drag-drop-zone">
+          Nhấp để chọn hoặc kéo thả file <strong>transparency.json</strong> vào đây
+          <input type="file" id="fileInput" accept=".json" class="hidden">
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="glass-card text-center hidden">
+      <div class="spinner"></div>
+      <p class="mt-4" id="loadingText">Đang tải và kiểm chứng dữ liệu bốc thăm...</p>
+    </div>
+
+    <!-- Main Output Section -->
+    <div id="outputSection" class="dashboard-layout hidden">
+
+      <!-- Left Column: Verification checks -->
+      <div>
+        <!-- General Info -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 600;">Thông Tin Dự Án</h2>
+            <span id="overallStatus" class="status-badge">Hợp lệ</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-sub);">Tên dự án:</span>
+              <span id="infoProjectName" style="font-weight: 600;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-sub);">Project ID:</span>
+              <span id="infoProjectId" style="font-family: monospace; font-size: 0.8rem;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-sub);">Thời gian hoàn tất:</span>
+              <span id="infoCompletedAt">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-sub);">Số lượng bộ bài:</span>
+              <span id="infoDecksCount" style="font-weight: 600;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-sub);">Tổng số lượt bốc:</span>
+              <span id="infoStepsCount" style="font-weight: 600;">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Items List -->
+        <div class="glass-card">
+          <h2 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem;">Chi Tiết Kiểm Chứng</h2>
+
+          <!-- Check 1: R_server commit -->
+          <div class="check-item">
+            <div class="check-icon" id="iconCommit">✅</div>
+            <div class="check-details">
+              <div class="check-title">R_server Commit</div>
+              <div class="check-desc">Xác minh mã cam kết băm của server trước khi bốc thăm.</div>
+              <pre id="logCommit" class="hidden"></pre>
+            </div>
+          </div>
+
+          <!-- Check 2: MASTER_SEED -->
+          <div class="check-item">
+            <div class="check-icon" id="iconSeed">✅</div>
+            <div class="check-details">
+              <div class="check-title">Hạt Giống Master Seed</div>
+              <div class="check-desc">Kiểm tra hạt giống tạo từ 3 nguồn entropy: Server, Giám sát, Blockchain.</div>
+              <pre id="logSeed" class="hidden"></pre>
+            </div>
+          </div>
+
+          <!-- Check 3: DeckHash -->
+          <div class="check-item">
+            <div class="check-icon" id="iconDeck">✅</div>
+            <div class="check-details">
+              <div class="check-title">Bộ Bài Niêm Phong (DeckHash)</div>
+              <div class="check-desc">Xác thực bộ bài sau khi xáo trùng khớp mã băm đã công bố trước bốc thăm.</div>
+              <pre id="logDeck" class="hidden"></pre>
+            </div>
+          </div>
+
+          <!-- Check 4: Hash-Chain -->
+          <div class="check-item">
+            <div class="check-icon" id="iconChain">✅</div>
+            <div class="check-details">
+              <div class="check-title">Chuỗi Liên Kết Nhật Ký (Hash-Chain)</div>
+              <div class="check-desc">Xác minh tính toàn vẹn, không bị chèn/xóa của nhật ký bấm lượt bốc.</div>
+              <pre id="logChain" class="hidden"></pre>
+            </div>
+          </div>
+
+          <!-- Check 5: Payload matching -->
+          <div class="check-item">
+            <div class="check-icon" id="iconPayload">✅</div>
+            <div class="check-details">
+              <div class="check-title">Nội Dung Phiếu Bốc Thăm</div>
+              <div class="check-desc">Đối chiếu kết quả ghi nhận với đúng lá phiếu tại vị trí bốc trong chồng phiếu.
+              </div>
+              <pre id="logPayload" class="hidden"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Deck Visualizer -->
+      <div class="glass-card" style="display: flex; flex-direction: column;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <h2 style="font-size: 1.15rem; font-weight: 600;">Xem Nội Dung Bộ Bài Thực Tế</h2>
+          <span style="font-size: 0.8rem; color: var(--text-sub);" id="deckStatsSummary">0 phiếu</span>
+        </div>
+
+        <!-- Tabs for rounds -->
+        <div class="tab-header" id="roundsTabHeader">
+          <!-- Buttons will be dynamically inserted here -->
+        </div>
+
+        <!-- Tickets Grid Container -->
+        <div class="deck-grid" id="deckTicketsGrid">
+          <!-- Cards will be dynamically inserted here -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Helper functions
+    function hexToBytes(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      }
+      return bytes;
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    async function sha256(bytes) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', bytes);
+      return new Uint8Array(hashBuffer);
+    }
+
+    async function sha256Hex(bytes) {
+      const hash = await sha256(bytes);
+      return bytesToHex(hash);
+    }
+
+    function serializeDeck(tickets) {
+      let text = "";
+      for (let i = 0; i < tickets.length; i++) {
+        text += i + "\t" + tickets[i] + "\n";
+      }
+      return new TextEncoder().encode(text);
+    }
+
+    function getTicketLabel(payload) {
+      if (payload === "TRUNG_QUYEN_MUA") return "Trúng quyền mua";
+      if (payload === "KHONG_TRUNG_UU_TIEN") return "Không trúng";
+      if (payload === "CHO_PHAN_LOAI_DU") return "Chờ phân loại";
+      if (payload.startsWith("TRUNG:")) return `Trúng: ${payload.substring(6)}`;
+      if (payload === "KHONG_TRUNG") return "Không trúng";
+      if (payload.startsWith("DU_KHUYET:")) return `Dự khuyết #${payload.substring(10)}`;
+      return payload;
+    }
+
+    function getTicketClass(payload) {
+      if (payload.startsWith("TRUNG")) return "ticket-win";
+      if (payload === "CHO_PHAN_LOAI_DU") return "ticket-wait";
+      if (payload.startsWith("DU_KHUYET")) return "ticket-waitlist";
+      return "ticket-lose";
+    }
+
+    function getRoundLabel(round) {
+      if (round === "A1") return "Vòng A1 (U2)";
+      if (round.startsWith("A2:")) return `Vòng A2 (${round.substring(3)})`;
+      if (round.startsWith("B:")) return `Vòng B (${round.substring(2)})`;
+      if (round === "C") return "Vòng C (Căn dư)";
+      return round;
+    }
+
+    // Verification Logic
+    async function verifyTransparency(data) {
+      const results = {
+        commit: { ok: true, logs: [] },
+        seed: { ok: true, logs: [] },
+        deck: { ok: true, logs: [] },
+        chain: { ok: true, logs: [] },
+        payload: { ok: true, logs: [] }
+      };
+
+      // 1 & 2. Verify Commitments & seeds
+      const sources = data.nguonNgauNhien || [];
+      for (const src of sources) {
+        results.commit.logs.push(`Vòng ${src.round}:`);
+        results.seed.logs.push(`Vòng ${src.round}:`);
+
+        if (!src.rServer || !src.rServerCommit) {
+          results.commit.ok = false;
+          results.commit.logs.push(`  ❌ Thiếu dữ liệu cam kết R_server`);
+          continue;
+        }
+
+        // Check R_server commit
+        try {
+          const rServerBytes = hexToBytes(src.rServer);
+          const computedCommit = await sha256Hex(rServerBytes);
+          const expectedCommit = src.rServerCommit.toLowerCase();
+
+          if (computedCommit === expectedCommit) {
+            results.commit.logs.push(`  ✅ R_server commit: Khớp (${computedCommit.substring(0, 16)}...)`);
+          } else {
+            results.commit.ok = false;
+            results.commit.logs.push(`  ❌ R_server commit: KHÔNG KHỚP`);
+            results.commit.logs.push(`     Mong đợi: ${expectedCommit}`);
+            results.commit.logs.push(`     Thực tế: ${computedCommit}`);
+          }
+        } catch (err) {
+          results.commit.ok = false;
+          results.commit.logs.push(`  ❌ Lỗi tính toán commit: ${err.message}`);
+        }
+
+        // Check Master Seed
+        try {
+          if (src.masterSeed) {
+            const rServerBytes = hexToBytes(src.rServer);
+            const rSupervisorBytes = src.rSupervisor ? hexToBytes(src.rSupervisor) : new Uint8Array(0);
+            const blockHashBytes = src.blockHash ? hexToBytes(src.blockHash) : new Uint8Array(0);
+
+            const combined = new Uint8Array(rServerBytes.length + rSupervisorBytes.length + blockHashBytes.length);
+            combined.set(rServerBytes, 0);
+            combined.set(rSupervisorBytes, rServerBytes.length);
+            combined.set(blockHashBytes, rServerBytes.length + rSupervisorBytes.length);
+
+            const computedSeed = await sha256Hex(combined);
+            const expectedSeed = src.masterSeed.toLowerCase();
+
+            if (computedSeed === expectedSeed) {
+              results.seed.logs.push(`  ✅ Master Seed: Khớp (${computedSeed.substring(0, 16)}...)`);
+            } else {
+              results.seed.ok = false;
+              results.seed.logs.push(`  ❌ Master Seed: KHÔNG KHỚP`);
+              results.seed.logs.push(`     Mong đợi: ${expectedSeed}`);
+              results.seed.logs.push(`     Thực tế: ${computedSeed}`);
+            }
+          } else {
+            results.seed.ok = false;
+            results.seed.logs.push(`  ❌ Không có masterSeed để đối chiếu`);
+          }
+        } catch (err) {
+          results.seed.ok = false;
+          results.seed.logs.push(`  ❌ Lỗi tính toán seed: ${err.message}`);
+        }
+      }
+
+      // 3. Verify Decks
+      const decks = data.decks || [];
+      for (const d of decks) {
+        try {
+          const computedDeckHash = await sha256Hex(serializeDeck(d.tickets));
+          const expectedDeckHash = d.deckHash.toLowerCase();
+
+          if (computedDeckHash === expectedDeckHash) {
+            results.deck.logs.push(`Vòng ${d.round}: ✅ Khớp (${computedDeckHash.substring(0, 16)}...)`);
+          } else {
+            results.deck.ok = false;
+            results.deck.logs.push(`Vòng ${d.round}: ❌ KHÔNG KHỚP`);
+            results.deck.logs.push(`  Mong đợi: ${expectedDeckHash}`);
+            results.deck.logs.push(`  Thực tế: ${computedDeckHash}`);
+          }
+        } catch (err) {
+          results.deck.ok = false;
+          results.deck.logs.push(`Vòng ${d.round}: ❌ Lỗi: ${err.message}`);
+        }
+      }
+
+      // 4. Verify Hash Chain
+      const steps = data.nhatKyBoc || [];
+      results.chain.logs.push(`Tổng số lượt bốc: ${steps.length}`);
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        if (!step.entryHash) {
+          results.chain.ok = false;
+          results.chain.logs.push(`Lượt #${i} (Vòng ${step.round}, Phiếu ${step.position}): ❌ Thiếu entryHash`);
+          break;
+        }
+
+        if (i === 0) {
+          if (step.prevHash !== null && step.prevHash !== undefined) {
+            results.chain.ok = false;
+            results.chain.logs.push(`Lượt đầu tiên: ❌ prevHash phải bằng null (thực tế: ${step.prevHash})`);
+            break;
+          }
+        } else {
+          const prevStep = steps[i - 1];
+          if (step.prevHash?.toLowerCase() !== prevStep.entryHash?.toLowerCase()) {
+            results.chain.ok = false;
+            results.chain.logs.push(`Lượt #${i} (Vòng ${step.round}, Phiếu ${step.position}): ❌ Đứt chuỗi băm`);
+            results.chain.logs.push(`  prevHash: ${step.prevHash}`);
+            results.chain.logs.push(`  entryHash trước: ${prevStep.entryHash}`);
+            break;
+          }
+        }
+      }
+      if (results.chain.ok && steps.length > 0) {
+        results.chain.logs.push(`✅ Chuỗi băm liên tục, không bị đứt gãy.`);
+      }
+
+      // 5. Verify Payload matches Deck Position
+      const deckLookup = {};
+      for (const d of decks) {
+        deckLookup[d.round] = d.tickets;
+      }
+
+      let mismatchCount = 0;
+      for (const step of steps) {
+        const tickets = deckLookup[step.round];
+        if (!tickets) {
+          results.payload.logs.push(`Vòng ${step.round}: ⚠️ Nhật ký chứa vòng không có bộ bài tương ứng`);
+          continue;
+        }
+
+        if (step.position < 0 || step.position >= tickets.length) {
+          mismatchCount++;
+          results.payload.logs.push(`Vòng ${step.round}, Phiếu ${step.position}: ❌ Vị trí bốc ngoài phạm vi bộ bài`);
+          continue;
+        }
+
+        const expectedPayload = tickets[step.position];
+        if (expectedPayload !== step.payload) {
+          mismatchCount++;
+          results.payload.logs.push(`Vòng ${step.round}, Phiếu ${step.position}: ❌ Sai lệch nội dung`);
+          results.payload.logs.push(`  Bộ bài: ${expectedPayload}`);
+          results.payload.logs.push(`  Nhật ký: ${step.payload}`);
+        }
+      }
+
+      if (mismatchCount === 0) {
+        results.payload.logs.push(`✅ Tất cả ${steps.length} lượt bốc khớp hoàn toàn với vị trí bộ bài tương ứng.`);
+      } else {
+        results.payload.ok = false;
+        results.payload.logs.push(`❌ Phát hiện ${mismatchCount} lượt bốc sai lệch nội dung.`);
+      }
+
+      return results;
+    }
+
+    // Rendering Functions
+    function updateCheckUI(id, data, logText) {
+      const iconEl = document.getElementById(`icon${id}`);
+      const logEl = document.getElementById(`log${id}`);
+
+      logEl.textContent = logText.join('\n');
+      logEl.classList.remove('hidden');
+
+      if (data.ok) {
+        iconEl.textContent = '✅';
+        iconEl.style.background = 'rgba(16, 185, 129, 0.15)';
+        iconEl.style.color = 'var(--success)';
+      } else {
+        iconEl.textContent = '❌';
+        iconEl.style.background = 'rgba(239, 68, 68, 0.15)';
+        iconEl.style.color = 'var(--error)';
+      }
+    }
+
+    function renderDeck(deck, steps) {
+      const grid = document.getElementById('deckTicketsGrid');
+      const stats = document.getElementById('deckStatsSummary');
+      grid.innerHTML = '';
+
+      stats.textContent = `${deck.tickets.length} phiếu (Trúng: ${deck.wonCount})`;
+
+      // Check which positions are auto-drawn in this round
+      const autoDrawnPositions = new Set(
+        (steps || [])
+          .filter(s => s.round === deck.round && s.autoDrawn)
+          .map(s => s.position)
+      );
+
+      deck.tickets.forEach((ticket, i) => {
+        const card = document.createElement('div');
+        card.className = `ticket-card ${getTicketClass(ticket)}`;
+
+        const isAuto = autoDrawnPositions.has(i);
+
+        card.innerHTML = `
+        <div class="ticket-pos">Phiếu số ${i} ${isAuto ? '<span style="color: var(--warning)">(Tự động)</span>' : ''}</div>
+        <div class="ticket-payload">${getTicketLabel(ticket)}</div>
+      `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleDataLoaded(data) {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('outputSection').classList.remove('hidden');
+
+      // Fill project Info
+      document.getElementById('infoProjectName').textContent = data.projectName;
+      document.getElementById('infoProjectId').textContent = data.projectId;
+      document.getElementById('infoCompletedAt').textContent = data.completedAt ? new Date(data.completedAt).toLocaleString('vi-VN') : '-';
+      document.getElementById('infoDecksCount').textContent = data.decks?.length || 0;
+      document.getElementById('infoStepsCount').textContent = data.nhatKyBoc?.length || 0;
+
+      // Run verification
+      verifyTransparency(data).then(results => {
+        const overallOk = results.commit.ok && results.seed.ok && results.deck.ok && results.chain.ok && results.payload.ok;
+
+        const badge = document.getElementById('overallStatus');
+        if (overallOk) {
+          badge.textContent = 'Hợp lệ';
+          badge.className = 'status-badge status-success';
+        } else {
+          badge.textContent = 'Bất thường';
+          badge.className = 'status-badge status-error';
+        }
+
+        updateCheckUI('Commit', results.commit, results.commit.logs);
+        updateCheckUI('Seed', results.seed, results.seed.logs);
+        updateCheckUI('Deck', results.deck, results.deck.logs);
+        updateCheckUI('Chain', results.chain, results.chain.logs);
+        updateCheckUI('Payload', results.payload, results.payload.logs);
+      });
+
+      // Setup Round Tabs
+      const tabHeader = document.getElementById('roundsTabHeader');
+      tabHeader.innerHTML = '';
+
+      if (data.decks && data.decks.length > 0) {
+        data.decks.forEach((deck, idx) => {
+          const btn = document.createElement('button');
+          btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
+          btn.textContent = getRoundLabel(deck.round);
+          btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderDeck(deck, data.nhatKyBoc);
+          };
+          tabHeader.appendChild(btn);
+        });
+
+        // Show first deck
+        renderDeck(data.decks[0], data.nhatKyBoc);
+      }
+    }
+
+    // Network Fetching
+    async function startVerificationLive() {
+      const apiUrl = document.getElementById('apiUrl').value.trim();
+      const projectId = document.getElementById('projectId').value.trim();
+
+      if (!apiUrl || !projectId) {
+        alert('Vui lòng nhập đầy đủ Server API URL và Project ID.');
+        return;
+      }
+
+      document.getElementById('outputSection').classList.add('hidden');
+      const loading = document.getElementById('loadingState');
+      loading.classList.remove('hidden');
+      document.getElementById('loadingText').textContent = 'Đang tải dữ liệu minh bạch từ server...';
+
+      try {
+        const url = `${apiUrl}/projects/${projectId}/transparency`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`Mã lỗi HTTP ${response.status}: ${text}`);
+        }
+
+        const data = await response.json();
+        handleDataLoaded(data);
+      } catch (err) {
+        loading.classList.add('hidden');
+        alert(`Lỗi kết nối hoặc xử lý dữ liệu: ${err.message}\n\nHướng dẫn: Đảm bảo server đang chạy và có mở CORS cho file cục bộ này, hoặc dùng tính năng kéo thả file JSON offline bên dưới.`);
+      }
+    }
+
+    // Offline File drag-drop handling
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.onclick = () => fileInput.click();
+
+    dropZone.ondragover = dropZone.ondragenter = (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    };
+
+    dropZone.ondragleave = (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    };
+
+    dropZone.ondrop = (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+
+      if (e.dataTransfer.files.length > 0) {
+        processFile(e.dataTransfer.files[0]);
+      }
+    };
+
+    fileInput.onchange = () => {
+      if (fileInput.files.length > 0) {
+        processFile(fileInput.files[0]);
+      }
+    };
+
+    function processFile(file) {
+      const reader = new FileReader();
+
+      document.getElementById('outputSection').classList.add('hidden');
+      const loading = document.getElementById('loadingState');
+      loading.classList.remove('hidden');
+      document.getElementById('loadingText').textContent = 'Đang đọc và phân tích file JSON...';
+
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.projectId || !data.decks) {
+            throw new Error('Cấu trúc file JSON không khớp định dạng TransparencyData.');
+          }
+          handleDataLoaded(data);
+        } catch (err) {
+          loading.classList.add('hidden');
+          alert(`Không thể đọc file: ${err.message}`);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById('btnVerify').onclick = startVerificationLive;
+  </script>
+
+</body>
+
+</html>
